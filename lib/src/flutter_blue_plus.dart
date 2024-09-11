@@ -107,7 +107,7 @@ class FlutterBluePlus {
   ///       This option has no effect on Android.
   ///   - [restoreState] Whether to opt into state restoration (iOS & MacOS only). i.e. CBCentralManagerOptionRestoreIdentifierKey
   ///       To set this option you must call this method before any other method in this package.
-  ///       See Apple Documentation for more details. This option has no effect on Android.    
+  ///       See Apple Documentation for more details. This option has no effect on Android.
   static Future<void> setOptions({
     bool showPowerAlert = true,
     bool restoreState = false,
@@ -358,12 +358,12 @@ class FlutterBluePlus {
     }
   }
 
-  /// Stops a scan for Bluetooth Low Energy devices 
+  /// Stops a scan for Bluetooth Low Energy devices
   static Future<void> stopScan() async {
     _Mutex mtx = _MutexFactory.getMutexForKey("scan");
     await mtx.take();
     try {
-      if(isScanningNow) {
+      if (isScanningNow) {
         await _stopScan();
       } else if (_logLevel.index >= LogLevel.info.index) {
         print("[FBP] stopScan: already stopped");
@@ -580,6 +580,13 @@ class FlutterBluePlus {
         }
       }
     }
+  }
+
+  static Future<dynamic> invokeMethod(
+    String method, [
+    dynamic arguments,
+  ]) async {
+    return _invokeMethod(method, arguments);
   }
 
   /// invoke a platform method

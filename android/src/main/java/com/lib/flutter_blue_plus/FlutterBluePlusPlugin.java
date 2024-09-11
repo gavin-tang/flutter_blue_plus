@@ -1458,7 +1458,14 @@ public class FlutterBluePlusPlugin implements
                     result.success(true);
                     break;
                 }
-
+                case "isConnected":
+                {
+                    String remoteId = (String) call.arguments;
+                    // get bond state
+                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(remoteId);
+                    result.success(isConnected(device));
+                    break;
+                }
                 default:
                 {
                     result.notImplemented();
@@ -1474,6 +1481,20 @@ public class FlutterBluePlusPlugin implements
             return;
         } finally {
             mMethodCallMutex.release();
+        }
+    }
+
+    public boolean isConnected(BluetoothDevice device) {
+        try {
+            // 获取 BluetoothDevice 类中的 "isConnected" 方法
+            java.lang.reflect.Method method = device.getClass().getMethod("isConnected");
+
+            // 调用该方法，并将返回值转换为 Boolean
+            return (Boolean) method.invoke(device);
+        } catch (Exception e) {
+            // 如果发生异常，抛出 IllegalStateException 并将异常作为参数传递
+//            throw new IllegalStateException(e);
+            return  false;
         }
     }
 
