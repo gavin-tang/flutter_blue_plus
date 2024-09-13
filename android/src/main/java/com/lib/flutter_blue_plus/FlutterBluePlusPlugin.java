@@ -8,6 +8,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -1481,56 +1482,6 @@ public class FlutterBluePlusPlugin implements
                     // get bond state
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(remoteId);
                     result.success(isConnected(device));
-                    break;
-                }
-                case "getA2DPConnectedDevice":
-                {
-                    ArrayList<String> permissions = new ArrayList<>();
-
-                    if (Build.VERSION.SDK_INT >= 31) { // Android 12 (October 2021)
-                        permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
-                    }
-
-                    ensurePermissions(permissions, (granted, perm) -> {
-
-                        if (granted == false) {
-                            result.error("getSystemDevices",
-                                    String.format("FlutterBluePlus requires %s permission", perm), null);
-                            return;
-                        }
-
-                        if (mBluetoothAdapter != null) {
-                            BluetoothProfile.ServiceListener profileListener = new BluetoothProfile.ServiceListener() {
-                                public void onServiceConnected(int profile, BluetoothProfile proxy) {
-                                    if (profile == BluetoothProfile.A2DP) {
-                                        List<BluetoothDevice> devices = ((BluetoothA2dp) proxy).getConnectedDevices();
-
-                                        List<HashMap<String, Object>> devList = new ArrayList<HashMap<String, Object>>();
-                                        for (BluetoothDevice d : devices) {
-                                            devList.add(bmBluetoothDevice(d));
-                                        }
-
-                                        // See: BmDevicesList
-                                        HashMap<String, Object> response = new HashMap<>();
-                                        response.put("devices", devList);
-
-                                        result.success(response);
-                                    }
-                                }
-                                public void onServiceDisconnected(int profile) {
-                                    if (profile == BluetoothProfile.A2DP) {
-                                        List<HashMap<String, Object>> devList = new ArrayList<HashMap<String, Object>>();
-                                        HashMap<String, Object> response = new HashMap<>();
-                                        response.put("devices", devList);
-
-                                        result.success(response);
-                                    }
-                                }
-                            };
-                            // this includes devices connected by other apps
-                            mBluetoothAdapter.getProfileProxy(context,profileListener,BluetoothProfile.A2DP);
-                        }
-                    });
                     break;
                 }
                 default:
